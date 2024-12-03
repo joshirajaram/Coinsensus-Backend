@@ -7,6 +7,7 @@ from datetime import datetime
 from core import db
 from models import Transaction
 import json
+import uuid
 
 router = APIRouter()
 
@@ -16,7 +17,7 @@ def create_transaction(transaction: dict) -> Any:
     Create new trans.
     """
     txn = Transaction(
-        id = transaction["id"],
+        id = str(uuid.uuid4()),
         sender = transaction["sender"],
         sender_private_key = transaction["sender_private_key"],
         receiver = transaction["receiver"],
@@ -26,4 +27,5 @@ def create_transaction(transaction: dict) -> Any:
     err = db.add_transaction(txn)
     if err is not None:
         print("Transaction not committed. Error:", err)
-    print("Transaction committed successfully")
+    else:
+        print("Transaction committed successfully")
