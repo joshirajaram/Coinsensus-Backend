@@ -15,19 +15,20 @@ def create_user(user: dict) -> Any:
     """
     Create new user.
     """
-    user = User(
+    user_object = User(
         id = str(uuid.uuid4()),
         public_key = user["public_key"],
         private_key = user["private_key"],
         username = user["username"],
         password = user["password"],
-        name = user["name"],
+        name = user["username"],
         signup_ts = datetime.now().timestamp(),
     )
-    (id, err) = db.add_user(user)
+    print(user, user_object)
+    (id, err) = db.add_user(user_object)
     if err is not None:
         print("Transaction not committed. Error:", err)
     else:
-        sqlite_db.SQLiteDB().insert_user(user, id)
+        sqlite_db.SQLiteDB().insert_user(user_object, id)
         print("Transaction committed successfully")
         return id

@@ -49,6 +49,11 @@ def add_user(user: User) -> Tuple[Optional[str], Optional[str]]:
         }
     }
 
+    # Serialize the asset dictionary to a JSON-formatted string
+    asset_json = json.dumps(asset)
+    print(asset_json)
+
+    # Construct the GraphQL mutation query
     query = f"""
     mutation {{
         postTransaction(data: {{
@@ -60,8 +65,8 @@ def add_user(user: User) -> Tuple[Optional[str], Optional[str]]:
             asset: \"\"\"{json.dumps(asset)}\"\"\",
         }}) {{
             id
-            }}
         }}
+    }}
     """
 
     response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query}) 
