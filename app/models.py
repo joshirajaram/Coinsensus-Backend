@@ -5,7 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 class User(BaseModel):
-    id: int
+    id: str
     public_key: str
     private_key: str
     username: str

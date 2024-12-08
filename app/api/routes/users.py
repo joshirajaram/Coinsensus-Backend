@@ -23,7 +23,6 @@ def create_user(user: dict) -> Any:
         password = user["password"],
         name = user["name"],
         signup_ts = datetime.now().timestamp(),
-        friends = user["friends"]
     )
     err = db.add_user(user)
     if err is not None:

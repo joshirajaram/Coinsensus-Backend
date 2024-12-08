@@ -54,9 +54,9 @@ def add_user(user: User) -> Optional[str]:
         postTransaction(data: {{
             operation: "CREATE",
             amount: 1,
-            signerPublicKey: "{User.public_key}",
-            signerPrivateKey: "{User.private_key}",
-            recipientPublicKey: "{User.public_key}",
+            signerPublicKey: "{user.public_key}",
+            signerPrivateKey: "{user.private_key}",
+            recipientPublicKey: "{user.public_key}",
             asset: \"\"\"{json.dumps(asset)}\"\"\",
         }}) {{
             id
@@ -75,12 +75,9 @@ def add_user(user: User) -> Optional[str]:
 def update_balances(transaction: Transaction) -> Optional[str]:
     query = f"""
     query {{
-        getFilteredTransactions({{
-            asset: {{
-                data: {{
-                    "username": "{transaction.asset['data']['username']}"
-                }}
-            }}
+        getFilteredTransactions(filter: {{
+            ownerPublicKey: "{transaction.sender}",
+            recipientPublicKey: "{transaction.sender}"
         }}) {{
             id
             asset
@@ -115,7 +112,7 @@ def update_balances(transaction: Transaction) -> Optional[str]:
                 amount: {transaction.amount},
                 signerPublicKey: "{transaction.sender}",
                 signerPrivateKey: "{transaction.sender_private_key}",
-                recipientPublicKey: "{transaction.receiver}",
+                recipientPublicKey: "{transaction.sender}",
                 asset: \"\"\"{json.dumps(asset)}\"\"\",
             }}) {{
                 id

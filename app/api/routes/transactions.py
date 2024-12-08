@@ -38,7 +38,7 @@ def create_transaction(transaction: dict) -> Any:
         id = str(uuid.uuid4()),
         sender = transaction["sender"],
         sender_private_key = transaction["sender_private_key"],
-        receiver = transaction["receiver"],
+        receiver = transaction["sender"],
         amount = int(transaction["amount"]),
         timestamp = datetime.now().timestamp(),
         asset = asset
