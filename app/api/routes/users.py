@@ -4,7 +4,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Any
 from datetime import datetime
-from core import db
+from core import db, sqlite_db
 from models import User
 import uuid
 
@@ -24,8 +24,10 @@ def create_user(user: dict) -> Any:
         name = user["name"],
         signup_ts = datetime.now().timestamp(),
     )
-    err = db.add_user(user)
+    (id, err) = db.add_user(user)
     if err is not None:
         print("Transaction not committed. Error:", err)
     else:
+        sqlite_db.SQLiteDB().insert_user(user, id)
         print("Transaction committed successfully")
+        return id

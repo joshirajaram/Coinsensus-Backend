@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 from models import Transaction, User
 import json
 import requests
@@ -31,7 +31,7 @@ def add_transaction(transaction: Transaction) -> Optional[str]:
     else:
         return str(response)
     
-def add_user(user: User) -> Optional[str]:
+def add_user(user: User) -> Tuple[Optional[str], Optional[str]]:
     """Generate POST API Request to ResDB"""
 
     asset = {
@@ -68,9 +68,10 @@ def add_user(user: User) -> Optional[str]:
     print("response status code: ", response.status_code)
     if response.status_code == 200: 
         print("response : ",response.content)
-        return None
+        res = json.loads(response.content)
+        return (res["data"]["postTransaction"]["id"], None)
     else:
-        return str(response)
+        return (None, str(response))
 
 def update_balances(transaction: Transaction) -> Optional[str]:
     query = f"""
