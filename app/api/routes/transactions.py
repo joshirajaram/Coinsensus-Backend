@@ -71,7 +71,7 @@ def get_transaction_history(username: str) -> Any:
 
 @router.get("/getBalances")
 def get_balances(username: str) -> Any:
-    transactions = sqlite_db.SQLiteDB().get_transaction_history(username)
+    transactions = sqlite_db.SQLiteDB().get_balances(username)
     balances = {}
     for friend in transactions:
         if friend not in balances:

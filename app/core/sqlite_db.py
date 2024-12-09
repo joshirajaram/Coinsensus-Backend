@@ -62,6 +62,24 @@ class SQLiteDB:
         self.connection.commit()
 
     def get_transaction_history(self, user: str):
+        transactions = []
+        self.cursor.execute('''
+            SELECT sender, receiver, amount, description, timestamp from transactions 
+            WHERE sender = ? OR receiver = ? 
+            ORDER BY timestamp DESC
+        ''', (user, user,))
+        rows = self.cursor.fetchall()
+        for row in rows:
+            transactions.append({
+                "sender": row[0],
+                "receiver": row[1],
+                "amount": row[2],
+                "description": row[3],
+                "timestamp": row[4]
+            })
+        return transactions
+
+    def get_balances(self, user: str):
         transactions = {}
 
         self.cursor.execute('''
