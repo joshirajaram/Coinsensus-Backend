@@ -13,16 +13,14 @@ class SQLiteDB:
         ''', (user.username, user.password, user.public_key, block_id))
         self.connection.commit()
 
-    def get_user(self, user: User):
+    def get_user_block_id(self, username: str):
         # Query data from the table
-        self.cursor.execute('SELECT * FROM users WHERE username=?', (user.username))
-
-        # Fetch all rows
-        rows = self.cursor.fetchall()
-
-        # Print results
-        for row in rows:
-            print(row)
+        # self.cursor.execute('SELECT resdb_block_id FROM users')
+        self.cursor.execute('SELECT resdb_block_id FROM users WHERE username=\'{}\''.format(username))
+        # self.cursor.execute('SELECT resdb_block_id FROM users WHERE username=user_name_1')
+        # print("Block id",str(self.cursor.fetchall()[0][0]))
+        return str(self.cursor.fetchall()[0][0])
+        # return "Hello"
 
     def close_connection(self):
         self.connection.close()
