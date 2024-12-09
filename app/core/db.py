@@ -3,9 +3,7 @@ from models import Transaction, User
 import json
 import requests
 
-def add_transaction(transaction: Transaction) -> Optional[str]:
-    """Generate POST API Request to ResDB"""
-
+def add_transaction(transaction: Transaction) -> Tuple[Optional[str], Optional[str]]:
     query = f"""
     mutation {{
         postTransaction(data: {{
@@ -20,16 +18,15 @@ def add_transaction(transaction: Transaction) -> Optional[str]:
             }}
         }}
     """
-    
-    update_balances(transaction)
 
     response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query}) 
     print("response status code: ", response.status_code)
-    if response.status_code == 200: 
+    if response.status_code == 200:
         print("response : ",response.content)
-        return None
+        res = json.loads(response.content)
+        return (res["data"]["postTransaction"]["id"], None)
     else:
-        return str(response)
+        return (None, str(response))
     
 def add_user(user: User) -> Tuple[Optional[str], Optional[str]]:
     """Generate POST API Request to ResDB"""
@@ -77,62 +74,6 @@ def add_user(user: User) -> Tuple[Optional[str], Optional[str]]:
         return (res["data"]["postTransaction"]["id"], None)
     else:
         return (None, str(response))
-
-def update_balances(transaction: Transaction) -> Optional[str]:
-    query = f"""
-    query {{
-        getFilteredTransactions(filter: {{
-            ownerPublicKey: "{transaction.sender}",
-            recipientPublicKey: "{transaction.sender}"
-        }}) {{
-            id
-            asset
-        }}
-    }}
-    """
-
-    response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query}) 
-    print("response status code: ", response.status_code)
-    if response.status_code == 200:
-        print("response : ",response.content)
-        id = response.json()['data']['getFilteredTransactions'][0]['id']
-        asset = response.json()['data']['getFilteredTransactions'][0]['asset']
-        
-        updated = False
-        for bal in asset['data']['balances']:
-            if bal['username'] == transaction.asset['data']['username']:
-                bal['balance'] += transaction.asset['data']['balance']
-                updated = True
-
-        if not updated:
-            asset['data']['balances'].append({
-                "username": transaction.asset['data']['username'],
-                "balance": transaction.asset['data']['balance']
-            })
-        
-        query = f"""
-        mutation {{
-            updateTransaction(data: {{
-                id: {id},
-                operation: "",
-                amount: {transaction.amount},
-                signerPublicKey: "{transaction.sender}",
-                signerPrivateKey: "{transaction.sender_private_key}",
-                recipientPublicKey: "{transaction.sender}",
-                asset: \"\"\"{json.dumps(asset)}\"\"\",
-            }}) {{
-                id
-            }}
-        }}
-        """
-
-        response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query}) 
-        print("response status code: ", response.status_code)
-        if response.status_code == 200: 
-            print("response : ",response.content)
-            return None
-        else:
-            return str(response)
         
 def get_user_details(id: str) -> Any:
     try:

@@ -43,8 +43,16 @@ def create_transaction(transaction: dict) -> Any:
         timestamp = datetime.now().timestamp(),
         asset = asset
     )
-    err = db.add_transaction(txn)
+    (id, err) = db.add_transaction(txn)
     if err is not None:
         print("Transaction not committed. Error:", err)
+        return {
+            'success': False,
+            'error': err
+        }
     else:
         print("Transaction committed successfully")
+        return {
+            'success': True,
+            'id': id
+        }
