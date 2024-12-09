@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple, Any, List
 from models import Transaction, User
 import json
 import requests
@@ -88,6 +88,7 @@ def get_user_details(id: str) -> Any:
         response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query})
         if response.status_code == 200:
             outer_dict = json.loads(response.content)
+            print(outer_dict)
             asset_str = outer_dict['data']['getTransaction']['asset'].replace("'", '"')
             asset_dict = json.loads(asset_str)
             return asset_dict['data']

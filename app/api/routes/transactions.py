@@ -56,7 +56,29 @@ def create_transaction(transaction: dict) -> Any:
             }
         else:
             print("Transaction committed successfully")
+            sqlite_db.SQLiteDB().insert_transaction(transaction["paid_by"], transaction["owed_by"][i], transaction["owed_amounts"][i], transaction["description"], str(txn.timestamp), id)
     return {
         'success': True,
         'id': id
+    }
+
+@router.get("/getTransactionHistory")
+def get_transaction_history(username: str) -> Any:
+    transactions = sqlite_db.SQLiteDB().get_transaction_history(username)
+    return {
+        'transactions': transactions
+    }
+
+@router.get("/getBalances")
+def get_balances(username: str) -> Any:
+    transactions = sqlite_db.SQLiteDB().get_transaction_history(username)
+    balances = {}
+    for friend in transactions:
+        if friend not in balances:
+            balances[friend] = 0
+        for txn in transactions[friend]:
+            balances[friend] += txn["amount"]
+    print('balances', balances)
+    return {
+        'balances': balances
     }
