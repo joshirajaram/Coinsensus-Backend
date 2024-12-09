@@ -58,8 +58,8 @@ def add_friend(username: str,friendName: str) -> Any:
     }
 
 
-@router.get("/getFriend")
-def get_friend(username: str) -> Any:
+@router.get("/getFriends")
+def get_friends(username: str) -> Any:
     resdb_block_id = sqlite_db.SQLiteDB().get_user_block_id(username)
     user_details = db.get_user_details(resdb_block_id)
-    return {'friends':user_details["friends"]}
+    return {'friends': user_details["friends"]}

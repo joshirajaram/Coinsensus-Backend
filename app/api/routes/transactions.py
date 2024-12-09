@@ -29,7 +29,8 @@ def create_transaction(transaction: dict) -> Any:
             "total_owed_amount": transaction["amount"],
             "paid_by": transaction["paid_by"],
             "owed_by": transaction["owed_by"],
-            "owed_amounts": transaction["owed_amounts"]
+            "owed_amounts": transaction["owed_amounts"],
+            "description": transaction["description"]
         }
     }
     sender_block_id = sqlite_db.SQLiteDB().get_user_block_id(transaction["paid_by"])
