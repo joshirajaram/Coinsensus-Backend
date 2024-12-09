@@ -13,14 +13,25 @@ class SQLiteDB:
         ''', (user.username, user.password, user.public_key, block_id))
         self.connection.commit()
 
+    def update_block_id(self, username: str, new_id: int) -> bool:
+        try:
+            self.cursor.execute('''
+                UPDATE users 
+                SET resdb_block_id = ? 
+                WHERE username = ?
+            ''', (new_id, username))
+            self.connection.commit()
+            if self.cursor.rowcount > 0:
+                return True
+            return False
+            
+        except sqlite3.Error as e:
+            print(f"Error updating block ID: {e}")
+            return False
+
     def get_user_block_id(self, username: str):
-        # Query data from the table
-        # self.cursor.execute('SELECT resdb_block_id FROM users')
         self.cursor.execute('SELECT resdb_block_id FROM users WHERE username=\'{}\''.format(username))
-        # self.cursor.execute('SELECT resdb_block_id FROM users WHERE username=user_name_1')
-        # print("Block id",str(self.cursor.fetchall()[0][0]))
         return str(self.cursor.fetchall()[0][0])
-        # return "Hello"
 
     def close_connection(self):
         self.connection.close()
