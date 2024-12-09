@@ -6,6 +6,7 @@ from typing import Any
 from datetime import datetime
 from core import db
 from models import Transaction
+from core import sqlite_db
 import uuid
 
 router = APIRouter()
@@ -20,9 +21,6 @@ def create_transaction(transaction: dict) -> Any:
     #     "paid_by": "user_id",
     #     "owed_by": ["user_id_1", "user_id_2"],
     #     "owed_amounts": [100, 100],
-    #     "sender": "user_id",
-    #     "sender_private_key": "private_key",
-    #     "receiver": "user_id",
     #     "amount": 300
     # }
     asset = {
@@ -34,25 +32,30 @@ def create_transaction(transaction: dict) -> Any:
             "owed_amounts": transaction["owed_amounts"]
         }
     }
-    txn = Transaction(
-        id = str(uuid.uuid4()),
-        sender = transaction["sender"],
-        sender_private_key = transaction["sender_private_key"],
-        receiver = transaction["sender"],
-        amount = int(transaction["amount"]),
-        timestamp = datetime.now().timestamp(),
-        asset = asset
-    )
-    (id, err) = db.add_transaction(txn)
-    if err is not None:
-        print("Transaction not committed. Error:", err)
-        return {
-            'success': False,
-            'error': err
-        }
-    else:
-        print("Transaction committed successfully")
-        return {
-            'success': True,
-            'id': id
-        }
+    sender_block_id = sqlite_db.SQLiteDB().get_user_block_id(transaction["paid_by"])
+    sender_user_details = db.get_user_details(sender_block_id)
+    
+    for i in range(len(transaction["owed_by"])):
+        receiver_public_key = sqlite_db.SQLiteDB().get_user_public_key(transaction["owed_by"][i])
+        txn = Transaction(
+            id = str(uuid.uuid4()),
+            sender = sender_user_details['signerPublicKey'],
+            sender_private_key = sender_user_details['signerPrivateKey'],
+            receiver = receiver_public_key,
+            amount = int(transaction["owed_amounts"][i]),
+            timestamp = datetime.now().timestamp(),
+            asset = asset
+        )
+        (id, err) = db.add_transaction(txn)
+        if err is not None:
+            print("Transaction not committed. Error:", err)
+            return {
+                'success': False,
+                'error': err
+            }
+        else:
+            print("Transaction committed successfully")
+    return {
+        'success': True,
+        'id': id
+    }

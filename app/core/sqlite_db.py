@@ -32,6 +32,10 @@ class SQLiteDB:
     def get_user_block_id(self, username: str):
         self.cursor.execute('SELECT resdb_block_id FROM users WHERE username=\'{}\''.format(username))
         return str(self.cursor.fetchall()[0][0])
+    
+    def get_user_public_key(self, username: str):
+        self.cursor.execute('SELECT public_key FROM users WHERE username=\'{}\''.format(username))
+        return str(self.cursor.fetchall()[0][0])
 
     def close_connection(self):
         self.connection.close()
