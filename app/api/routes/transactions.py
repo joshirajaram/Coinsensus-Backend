@@ -39,8 +39,8 @@ def create_transaction(transaction: dict) -> Any:
         receiver_public_key = sqlite_db.SQLiteDB().get_user_public_key(transaction["owed_by"][i])
         txn = Transaction(
             id = str(uuid.uuid4()),
-            sender = sender_user_details['signerPublicKey'],
-            sender_private_key = sender_user_details['signerPrivateKey'],
+            sender = sender_user_details['public_key'],
+            sender_private_key = sender_user_details['private_key'],
             receiver = receiver_public_key,
             amount = int(transaction["owed_amounts"][i]),
             timestamp = datetime.now().timestamp(),
