@@ -135,9 +135,7 @@ def update_balances(transaction: Transaction) -> Optional[str]:
             return str(response)
         
 def get_user_details(id: str) -> Any:
-    # print("Block id in db py",id)
     try:
-        print("inside get user sqlite")
         query = f"""
         query {{
             getTransaction(id: "{id}") {{
@@ -146,83 +144,30 @@ def get_user_details(id: str) -> Any:
             }}
         }}
         """
-        # print("after query")
         response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query})
-        # print("after response", response.content) 
         if response.status_code == 200:
             outer_dict = json.loads(response.content)
-            # print("*******************Res******************")
-            # print(response.content)
             asset_str = outer_dict['data']['getTransaction']['asset'].replace("'", '"')
             asset_dict = json.loads(asset_str)
-            # print("***********This is what you want it to be like***********")
-            # print(asset_dict)
             return asset_dict['data']
         else:
             return (None, str(response.status_code))
     except:
         return "Error in get_user_detail"
 
-# def add_friend(id: str, friend: str) -> Any:
-#     # Get user details
-#     try:
-#         user_asset = get_user_details(id)
-        
-        
-#         # Update friends list
-#         friends_list = user_asset['friends']
-#         friends_list.append(friend)
-#         print("Friend list",friends_list)
-#         # Construct query
-#         user_asset['friends']=friends_list
-#         # print("Asset",user_asset)
-#         print("*****************This is what we actually have***************")
-#         asset_we_put={"data":user_asset}
-#         print(asset_we_put)
-#         query = f"""
-#         mutation {{
-#             updateTransaction(data: {{
-#                 id: "{id}",
-#                 operation: "",
-#                 amount: 1,
-#                 signerPublicKey: {user_asset['public_key']},
-#                 signerPrivateKey: {user_asset['private_key']},
-#                 recipientPublicKey: {user_asset['public_key']},
-#                 asset: {asset_we_put},
-#             }}) {{
-#                 id
-#                 asset
-#             }}
-#         }}
-#         """
-        
-#         response = requests.post(url="http://localhost:8000/graphql", json={"query": query})
-#         print(response)
-#         print("Response code", response.status_code)
-#         if response.status_code == 200:
-#             print("response: ", response.content)
-#             return response.content
-#         else:
-#             return response.content
-#     except:
-#         return "Hellow Bossie"
-
 def add_friend(id: str, friend: str) -> Any:
     try:
         user_asset = get_user_details(id)
         
-        # Update friends list
         friends_list = user_asset['friends']
         friends_list.append(friend)
         print("Friend list", friends_list)
         
-        # Update asset
         user_asset['friends'] = friends_list
-        asset_we_put = {"data": user_asset}
+        asset = {"data": user_asset}
         
-        # Convert asset to JSON string and escape it properly
-        asset_json = json.dumps(asset_we_put)
-        # print("id in add friend",id)
+        asset_json = json.dumps(asset)
+
         query = f"""
         mutation {{
             updateTransaction(data: {{
@@ -239,19 +184,13 @@ def add_friend(id: str, friend: str) -> Any:
             }}
         }}
         """
-        
         response = requests.post(url="http://localhost:8000/graphql", json={"query": query})
-        # print(response)
-        # print("Response code", response.status_code)
         if response.status_code == 200:
-            # print("response: ", response.content)
-            dict = json.loads(response.content)
-            new_id=dict['data']['updateTransaction']['id']
-            print("New id",new_id)
-            print(dict)
-            return response.content
+            res = json.loads(response.content)
+            new_id = res['data']['updateTransaction']['id']
+            return new_id
         else:
             return response.content
     except Exception as e:
-        print("Error:", e)  # Better error handling
+        print("Error:", e)
         return f"Error occurred: {str(e)}"

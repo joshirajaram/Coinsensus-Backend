@@ -21,7 +21,7 @@ def create_user(user: dict) -> Any:
         private_key = user["private_key"],
         username = user["username"],
         password = user["password"],
-        name = user["name"],
+        name = user["username"],
         signup_ts = datetime.now().timestamp(),
     )
     print(user, user_object)
@@ -44,14 +44,12 @@ def get_user(username: str) -> Any:
 
 @router.post("/addFriend")
 def add_friend(username: str,friendName: str) -> Any:
-    # print("username",username)
-    # print("friend name",friendName)
     resdb_block_id = sqlite_db.SQLiteDB().get_user_block_id(username)
-    print(resdb_block_id)
-    # user_details = db.get_user_details(resdb_block_id)
-    # print("Friends before:",user_details['friends'])
-    x=db.add_friend(resdb_block_id, friendName)
-    # print("****************New*************")
-    # user_details = db.get_user_details('fe692a275fc1266b592f6f845bd43b20d051bc5e449ab724e896bc68aac61ecf')
-    # print("Friends after:",user_details['friends'])
-    return x
+    new_id=db.add_friend(resdb_block_id, friendName)
+    if(sqlite_db.SQLiteDB().update_block_id(username,new_id)):
+        return {
+            'success': True
+        }
+    return {
+        'success': False,
+    }
