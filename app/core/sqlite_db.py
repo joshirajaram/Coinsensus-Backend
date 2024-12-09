@@ -12,6 +12,23 @@ class SQLiteDB:
             VALUES (?, ?, ?, ?)
         ''', (user.username, user.password, user.public_key, block_id))
         self.connection.commit()
+        
+    def check_user(self, user: User) -> bool:
+        self.cursor.execute('SELECT 1 FROM users WHERE username = ?', (user.username,)) 
+        row = self.cursor.fetchone()
+        return row is not None
+
+
+    
+    def validate_username_password(self, username: str, password: str) -> bool:
+        self.cursor.execute('SELECT password FROM users WHERE username = ?', (username,))
+        row = self.cursor.fetchone()
+        print('entered password', password)
+        print('correct password', row[0])
+        if row:
+            return row[0] == password  # Compare stored password with the input
+        return False  # Return False if the user is not found
+
 
     def update_block_id(self, username: str, new_id: int) -> bool:
         try:

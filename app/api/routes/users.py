@@ -25,13 +25,30 @@ def create_user(user: dict) -> Any:
         signup_ts = datetime.now().timestamp(),
     )
     print(user, user_object)
+    if sqlite_db.SQLiteDB().check_user(user_object):
+        err = "User already exists"
+        return err
+
     (id, err) = db.add_user(user_object)
     if err is not None:
         print("Transaction not committed. Error:", err)
     else:
         sqlite_db.SQLiteDB().insert_user(user_object, id)
         print("Transaction committed successfully")
-        return id
+        return id,user_object.username
+    
+@router.get("/login/{username}/{password}")
+def login(username: str, password: str) -> Any:
+    print("Received login request:")
+    print(f"Username: {username}")
+    print(f"Password: {password}")
+    
+    success = sqlite_db.SQLiteDB().validate_username_password(username, password)
+    print(success)
+    if success:
+        return {"success": True}
+    else:
+        return {"success": False}
     
 @router.get("/getUser")
 def get_user(username: str) -> Any:
