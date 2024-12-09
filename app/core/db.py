@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple, Any, List
 from models import Transaction, User
 import json
 import requests
@@ -135,3 +135,63 @@ def add_friend(id: str, friend: str) -> Any:
     except Exception as e:
         print("Error:", e)
         return f"Error occurred: {str(e)}"
+    
+def get_transaction_history(user_public_key: str, friends: List[str], friends_public_keys: List[str]) -> Any:
+    transactions = {
+        "sent": {},
+        "received": {}
+    }
+    
+    # User in sender
+    for i in range(len(friends)):
+        try:
+            query = f"""
+            query {{ getFilteredTransactions(filter: {{
+                ownerPublicKey: "{user_public_key}",
+                recipientPublicKey: "{friends_public_keys[i]}"
+                }}) {{
+                    id
+                    asset
+                }}
+            }}
+            """
+            response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query})
+            if response.status_code == 200:
+                res = json.loads(response.content)
+                for transaction in res['data']['getFilteredTransactions']:
+                    if friends[i] not in transactions["sent"]:
+                        transactions["sent"][friends[i]] = []
+                    transactions["sent"][friends[i]].append(transaction)
+                # return asset_dict['data']
+            # else:
+            #     return (None, str(response.status_code))
+        except:
+            return "Error in get_transaction_history"
+    
+    # User in receiver
+    for i in range(len(friends)):
+        try:
+            query = f"""
+            query {{ getFilteredTransactions(filter: {{
+                ownerPublicKey: "{friends_public_keys[i]}",
+                recipientPublicKey: "{user_public_key}"
+                }}) {{
+                    id
+                    asset
+                }}
+            }}
+            """
+            response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query})
+            if response.status_code == 200:
+                res = json.loads(response.content)
+                for transaction in res['data']['getFilteredTransactions']:
+                    if friends[i] not in transactions["received"]:
+                        transactions["received"][friends[i]] = []
+                    transactions["received"][friends[i]].append(transaction)
+                # return asset_dict['data']
+            # else:
+            #     return (None, str(response.status_code))
+        except:
+            return "Error in get_transaction_history"
+    
+    return transactions
