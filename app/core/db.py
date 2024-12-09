@@ -88,6 +88,7 @@ def get_user_details(id: str) -> Any:
         response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query})
         if response.status_code == 200:
             outer_dict = json.loads(response.content)
+            print(outer_dict)
             asset_str = outer_dict['data']['getTransaction']['asset'].replace("'", '"')
             asset_dict = json.loads(asset_str)
             return asset_dict['data']
@@ -158,15 +159,18 @@ def get_transaction_history(user_public_key: str, friends: List[str], friends_pu
             response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query})
             if response.status_code == 200:
                 res = json.loads(response.content)
+                if res['data'] is None:
+                    continue
                 for transaction in res['data']['getFilteredTransactions']:
                     if friends[i] not in transactions["sent"]:
                         transactions["sent"][friends[i]] = []
                     transactions["sent"][friends[i]].append(transaction)
+            print('Updated transactions dict sender', transactions)
                 # return asset_dict['data']
             # else:
             #     return (None, str(response.status_code))
         except:
-            return "Error in get_transaction_history"
+            print("exception receiver", err)
     
     # User in receiver
     for i in range(len(friends)):
@@ -184,6 +188,9 @@ def get_transaction_history(user_public_key: str, friends: List[str], friends_pu
             response = requests.post(url = "http://localhost:8000/graphql", json = {"query": query})
             if response.status_code == 200:
                 res = json.loads(response.content)
+                print('res', res)
+                if res['data'] is None:
+                    continue
                 for transaction in res['data']['getFilteredTransactions']:
                     if friends[i] not in transactions["received"]:
                         transactions["received"][friends[i]] = []
@@ -191,7 +198,8 @@ def get_transaction_history(user_public_key: str, friends: List[str], friends_pu
                 # return asset_dict['data']
             # else:
             #     return (None, str(response.status_code))
-        except:
-            return "Error in get_transaction_history"
+            print('Updated transactions dict receiver', transactions)
+        except Exception as err:
+            print("exception receiver", err)
     
     return transactions

@@ -56,6 +56,7 @@ def create_transaction(transaction: dict) -> Any:
             }
         else:
             print("Transaction committed successfully")
+            sqlite_db.SQLiteDB().insert_transaction(transaction["paid_by"], transaction["owed_by"][i], transaction["owed_amounts"][i], transaction["description"], id)
     return {
         'success': True,
         'id': id
@@ -63,14 +64,16 @@ def create_transaction(transaction: dict) -> Any:
 
 @router.get("/getTransactionHistory")
 def get_transaction_history(username: str) -> Any:
-    resdb_block_id = sqlite_db.SQLiteDB().get_user_block_id(username)
-    user_details = db.get_user_details(resdb_block_id)
-    user_public_key = user_details['public_key']
-    friends = user_details["friends"]
-    friends_public_keys = []
-    for friend in friends:
-        friends_public_keys.append(sqlite_db.SQLiteDB().get_user_public_key(friend))
-    transactions = db.get_transaction_history(user_public_key, friends, friends_public_keys)
+    transactions = sqlite_db.SQLiteDB().get_transaction_history(username)
+    # resdb_block_id = sqlite_db.SQLiteDB().get_user_block_id(username)
+    # user_details = db.get_user_details(resdb_block_id)
+    # print(user_details)
+    # user_public_key = user_details['public_key']
+    # friends = user_details["friends"]
+    # friends_public_keys = []
+    # for friend in friends:
+    #     friends_public_keys.append(sqlite_db.SQLiteDB().get_user_public_key(friend))
+    # transactions = db.get_transaction_history(user_public_key, friends, friends_public_keys)
     return {
         'transactions': transactions
     }

@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
+from core import sqlite_db
 
 from api.main import api_router
 
@@ -19,3 +20,4 @@ app.include_router(api_router, prefix="/api")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)
+    # sqlite_db.SQLiteDB().get_transaction_history('user_name_5')

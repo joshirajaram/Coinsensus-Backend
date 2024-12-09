@@ -1,5 +1,5 @@
 import sqlite3
-from models import User
+from models import User, Transaction
 
 class SQLiteDB:
     def __init__(self):
@@ -53,6 +53,43 @@ class SQLiteDB:
     def get_user_public_key(self, username: str):
         self.cursor.execute('SELECT public_key FROM users WHERE username=\'{}\''.format(username))
         return str(self.cursor.fetchall()[0][0])
+    
+    def insert_transaction(self, sender: str, receiver: str, amount: int, description: str, resdb_transaction_id: str):
+        self.cursor.execute('''
+            INSERT INTO transactions (sender, receiver, amount, description, resdb_transaction_id) 
+            VALUES (?, ?, ?, ?, ?)
+        ''', (sender, receiver, amount, description, resdb_transaction_id))
+        self.connection.commit()
+
+    def get_transaction_history(self, user: str):
+        transactions = {
+            "amount": {},
+            "description": {}
+        }
+        print('user', user)
+        self.cursor.execute('''
+            SELECT receiver, amount, description from transactions WHERE sender = ?
+        ''', (user,))
+        sender = self.cursor.fetchall()
+        print('send', sender)
+        for txn in sender:
+            if txn[0] not in transactions["amount"]:
+                transactions["amount"][txn[0]] = []
+                transactions["description"][txn[0]] = []
+            transactions["amount"][txn[0]].append(txn[1])
+            transactions["description"][txn[0]].append(txn[2])
+        self.cursor.execute('''
+            SELECT sender, amount, description from transactions WHERE receiver = ?
+        ''', (user,))
+        receiver = self.cursor.fetchall()
+        print('rec', receiver)
+        for txn in receiver:
+            if txn[0] not in transactions["amount"]:
+                transactions["amount"][txn[0]] = []
+                transactions["description"][txn[0]] = []
+            transactions["amount"][txn[0]].append(-1 * txn[1])
+            transactions["description"][txn[0]].append(txn[2])
+        return transactions
 
     def close_connection(self):
         self.connection.close()
