@@ -6,10 +6,11 @@ from typing import Any
 from datetime import datetime
 from core import db
 from models import Transaction
-from core import sqlite_db
+from core import sqlite_db, postgres_db
 import uuid
 
 router = APIRouter()
+postgres = postgres_db.PostgresDB()
 
 @router.post("/createTransaction")
 def create_transaction(transaction: dict) -> Any:
@@ -33,11 +34,13 @@ def create_transaction(transaction: dict) -> Any:
             "description": transaction["description"]
         }
     }
-    sender_block_id = sqlite_db.SQLiteDB().get_user_block_id(transaction["paid_by"])
+    # sender_block_id = sqlite_db.SQLiteDB().get_user_block_id(transaction["paid_by"])
+    sender_block_id = postgres.get_user_block_id(transaction["paid_by"])
     sender_user_details = db.get_user_details(sender_block_id)
     
     for i in range(len(transaction["owed_by"])):
-        receiver_public_key = sqlite_db.SQLiteDB().get_user_public_key(transaction["owed_by"][i])
+        # receiver_public_key = sqlite_db.SQLiteDB().get_user_public_key(transaction["owed_by"][i])
+        receiver_public_key = postgres.get_user_public_key(transaction["owed_by"][i])
         txn = Transaction(
             id = str(uuid.uuid4()),
             sender = sender_user_details['public_key'],
@@ -56,7 +59,8 @@ def create_transaction(transaction: dict) -> Any:
             }
         else:
             print("Transaction committed successfully")
-            sqlite_db.SQLiteDB().insert_transaction(transaction["paid_by"], transaction["owed_by"][i], transaction["owed_amounts"][i], transaction["description"], str(txn.timestamp), id)
+            # sqlite_db.SQLiteDB().insert_transaction(transaction["paid_by"], transaction["owed_by"][i], transaction["owed_amounts"][i], transaction["description"], str(txn.timestamp), id)
+            postgres.insert_transaction(transaction["paid_by"], transaction["owed_by"][i], transaction["owed_amounts"][i], transaction["description"], txn.timestamp, id)
     return {
         'success': True,
         'id': id
@@ -64,14 +68,16 @@ def create_transaction(transaction: dict) -> Any:
 
 @router.get("/getTransactionHistory")
 def get_transaction_history(username: str) -> Any:
-    transactions = sqlite_db.SQLiteDB().get_transaction_history(username)
+    # transactions = sqlite_db.SQLiteDB().get_transaction_history(username)
+    transactions = postgres.get_transaction_history(username)
     return {
         'transactions': transactions
     }
 
 @router.get("/getBalances")
 def get_balances(username: str) -> Any:
-    transactions = sqlite_db.SQLiteDB().get_balances(username)
+    # transactions = sqlite_db.SQLiteDB().get_balances(username)
+    transactions = postgres.get_balances(username)
     balances = {}
     for friend in transactions:
         if friend not in balances:
