@@ -1,0 +1,24 @@
+curl --location 'http://localhost:8080/api/transactions/createTransaction' \
+--header 'Content-Type: application/json' \
+--data '{
+    "method": "add_expense",
+    "paid_by": "user_name_0",
+    "owed_by": ["user_name_1"],
+    "owed_amounts": [100],
+    "amount": 30
+}'
+
+curl --location 'http://localhost:8080/api/users/getUser?username=user_name_24' \
+--header 'Content-Type: application/json'
+
+curl --location 'http://localhost:8080/api/users/addFriend?username=user_name_11&friendName=friend_user_14' 
+--header 'Content-Ty11e: application/json' --request POST
+
+curl --location 'localhost:8000/graphql' \
+--header 'Content-Type: application/json' \
+--data '{"query":"mutation { generateKeys {\n  publicKey\n  privateKey\n  } \n}","variables":{}}'
+
+curl --location 'localhost:8000/graphql' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query {getTransaction(id: \"a67e0ddec70fff96deee6dedfc23e217a7a8a7f64a1a35214aba5544f0b00023\") {\n  id\n  version\n  amount\n  metadata\n  operation\n  asset\n  publicKey\n  uri\n}}","variables":{}}'
+
