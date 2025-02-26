@@ -92,7 +92,7 @@ class PostgresDB:
         try:
             self.cursor.execute('''
                 INSERT INTO transactions (sender, receiver, amount, description, timestamp, resdb_transaction_id) 
-                VALUES (%s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, to_timestamp(%s), %s)
             ''', (sender, receiver, amount, description, timestamp, resdb_transaction_id))
             self.connection.commit()
         except Error as e:
