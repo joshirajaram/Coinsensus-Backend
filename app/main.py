@@ -3,7 +3,7 @@ from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
-from api.main import api_router
+from app.api.main import api_router
 
 app = FastAPI()
 

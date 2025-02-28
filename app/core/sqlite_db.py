@@ -1,5 +1,5 @@
 import sqlite3
-from models import User, Transaction
+from app.models import User, Transaction
 
 class SQLiteDB:
     def __init__(self):

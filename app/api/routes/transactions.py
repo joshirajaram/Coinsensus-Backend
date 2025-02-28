@@ -4,9 +4,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Any
 from datetime import datetime
-from core import db
-from models import Transaction
-from core import sqlite_db, postgres_db
+from app.core import db
+from app.models import Transaction
+from app.core import sqlite_db, postgres_db
 import uuid
 
 router = APIRouter()

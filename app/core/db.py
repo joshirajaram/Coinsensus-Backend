@@ -1,9 +1,9 @@
 from typing import Optional, Tuple, Any, List
-from models import Transaction, User
+from app.models import Transaction, User
 import json
 import requests
 
-from core import config
+from app.core import config
 
 def add_transaction(transaction: Transaction) -> Tuple[Optional[str], Optional[str]]:
     query = f"""

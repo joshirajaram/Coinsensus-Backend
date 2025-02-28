@@ -1,9 +1,9 @@
 import psycopg2
 from psycopg2 import Error
-from models import User, Transaction
+from app.models import User, Transaction
 import os
 from typing import Optional, Dict, List
-from core import config
+from app.core import config
 
 class PostgresDB:
     _instance = None
