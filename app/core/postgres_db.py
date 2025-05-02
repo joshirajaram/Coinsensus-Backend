@@ -54,7 +54,7 @@ class PostgresDB:
         try:
             with conn.cursor() as cur:
                 cur.execute('SELECT password FROM users WHERE username = %s', (username,))
-                row = self.cursor.fetchone()
+                row = cur.fetchone()
                 return row is not None and row[0] == password
         except Error as e:
             print(f"Error validating credentials: {e}")
@@ -72,7 +72,7 @@ class PostgresDB:
                     WHERE username = %s
                 ''', (new_id, username))
                 conn.commit()
-                return self.cursor.rowcount > 0
+                return cur.rowcount > 0
         except Error as e:
             print(f"Error updating block ID: {e}")
             conn.rollback()
@@ -85,7 +85,7 @@ class PostgresDB:
         try:
             with conn.cursor() as cur:
                 cur.execute('SELECT resdb_block_id FROM users WHERE username = %s', (username,))
-                result = self.cursor.fetchone()
+                result = cur.fetchone()
                 return str(result[0]) if result else None
         except Error as e:
             print(f"Error getting user block ID: {e}")
@@ -98,7 +98,7 @@ class PostgresDB:
         try:
             with conn.cursor() as cur:
                 cur.execute('SELECT public_key FROM users WHERE username = %s', (username,))
-                result = self.cursor.fetchone()
+                result = cur.fetchone()
                 return str(result[0]) if result else None
         except Error as e:
             print(f"Error getting user public key: {e}")
