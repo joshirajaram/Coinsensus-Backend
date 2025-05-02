@@ -164,6 +164,17 @@ class PostgresDB:
             print(f"Error getting balances: {e}")
             return {}
 
+    def check_connection(self):
+        try:
+            if self.connection:
+                self.cursor.execute("SELECT 1")
+                return True
+            else:
+                return False
+        except Error as e:
+            print(f"Error checking database connection: {e}")
+            return False
+
     def close_connection(self):
         try:
             if self.cursor:
