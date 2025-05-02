@@ -4,8 +4,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Any
 from datetime import datetime
-from app.core import db, sqlite_db, postgres_db
-from app.models import User
+from core import db, sqlite_db, postgres_db
+from models import User
 import uuid
 
 router = APIRouter()
@@ -70,7 +70,7 @@ def add_friend(username: str,friendName: str) -> Any:
     resdb_block_id = postgres.get_user_block_id(username)
     new_id=db.add_friend(resdb_block_id, friendName)
     # resdb_block_id_friend = sqlite_db.SQLiteDB().get_user_block_id(friendName)
-    resdb_block_id = postgres.get_user_block_id(friendName)
+    resdb_block_id_friend = postgres.get_user_block_id(friendName)
     new_id_friend = db.add_friend(resdb_block_id_friend, username)
     # if(sqlite_db.SQLiteDB().update_block_id(username, new_id) and 
     #    sqlite_db.SQLiteDB().update_block_id(friendName, new_id_friend)):

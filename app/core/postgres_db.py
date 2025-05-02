@@ -1,14 +1,16 @@
 import psycopg2
 from psycopg2 import Error
-from app.models import User, Transaction
+from models import User, Transaction
 import os
 from typing import Optional, Dict, List
-from app.core import config
+from core import config
 
 class PostgresDB:
     _instance = None
 
     def __init__(self):
+        self.connection = None
+        self.cursor = None
         # Get connection details from environment variables for security
         if not PostgresDB._instance:
             PostgresDB._instance = self
