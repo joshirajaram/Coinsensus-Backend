@@ -156,7 +156,7 @@ def add_friend(id: str, friend: str) -> Any:
         print("response : ", response.content)
         if response.status_code == 200:
             res = json.loads(response.content)
-            new_id = res['data']['updateTransaction']['id']
+            new_id = res['data']['postTransaction']['id']
             return new_id
         else:
             return response.content
